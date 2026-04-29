@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Business Manager v5</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #0f0f12;
+            --bg-tertiary: #18181b;
+            --bg-card: #131316;
+            --bg-hover: #1f1f23;
+            --border: #27272a;
+            --border-hover: #3f3f46;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --accent-green: #22c55e;
+            --accent-green-dim: rgba(34, 197, 94, 0.15);
+            --accent-blue: #3b82f6;
+            --accent-blue-dim: rgba(59, 130, 246, 0.15);
+            --accent-orange: #f97316;
+            --accent-orange-dim: rgba(249, 115, 22, 0.15);
+            --accent-red: #ef4444;
+            --accent-red-dim: rgba(239, 68, 68, 0.15);
+            --accent-purple: #a855f7;
+            --accent-purple-dim: rgba(168, 85, 247, 0.15);
+            --accent-yellow: #eab308;
+            --accent-yellow-dim: rgba(234, 179, 8, 0.15);
+            --radius: 8px;
+            --radius-lg: 12px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .app { display: flex; min-height: 100vh; }
+        
+        .sidebar { width: 240px; background: var(--bg-secondary); border-right: 1px solid var(--border); position: fixed; height: 100vh; }
+        .sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); }
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent-green), #16a34a); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; }
+        .logo-icon svg { width: 20px; height: 20px; fill: white; }
+        .logo-text { font-weight: 700; font-size: 15px; }
+        .logo-text span { color: var(--accent-green); }
+        .sidebar-nav { padding: 12px; }
+        .nav-section { margin-bottom: 16px; }
+        .nav-section-title { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; padding: 8px 12px; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--radius); cursor: pointer; color: var(--text-secondary); font-weight: 500; font-size: 13px; margin-bottom: 2px; }
+        .nav-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .nav-item.active { background: var(--accent-green-dim); color: var(--accent-green); }
+        .nav-item svg { width: 18px; height: 18px; }
+        
+        .main { flex: 1; margin-left: 240px; }
+        .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+        .header-title { font-size: 16px; font-weight: 600; }
+        .status-badge { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 100px; font-size: 12px; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); }
+        .status-dot.online { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+        .page-content { padding: 24px; }
+        
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 16px; }
+        .card-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--bg-tertiary); }
+        .card-title { font-size: 13px; font-weight: 600; }
+        .card-body { padding: 18px; }
+        
+        .form-group { margin-bottom: 14px; }
+        .form-label { display: block; font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-input, .form-select, .form-textarea { width: 100%; padding: 10px 12px; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-primary); font-family: inherit; font-size: 13px; }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--accent-green); }
+        .form-input::placeholder, .form-textarea::placeholder { color: var(--text-muted); }
+        .form-textarea { min-height: 80px; resize: vertical; }
+        .form-input.mono, .form-textarea.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+        .form-select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 36px; }
+        .form-hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: var(--radius); font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; position: relative; }
+        .btn-primary { background: linear-gradient(135deg, var(--accent-green), #16a34a); color: white; }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-1px); }
+        .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--bg-hover); }
+        .btn-danger { background: var(--accent-red-dim); color: var(--accent-red); }
+        .btn-danger:hover { background: var(--accent-red); color: white; }
+        .btn-sm { padding: 6px 10px; font-size: 12px; }
+        .btn svg { width: 16px; height: 16px; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+        
+        /* Loading spinner */
+        .btn-loading .btn-text { visibility: hidden; }
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .badge { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 100px; font-size: 11px; font-weight: 600; }
+        .badge-green { background: var(--accent-green-dim); color: var(--accent-green); }
+        .badge-blue { background: var(--accent-blue-dim); color: var(--accent-blue); }
+        .badge-orange { background: var(--accent-orange-dim); color: var(--accent-orange); }
+        .badge-red { background: var(--accent-red-dim); color: var(--accent-red); }
+        .badge-purple { background: var(--accent-purple-dim); color: var(--accent-purple); }
+        .badge-yellow { background: var(--accent-yellow-dim); color: var(--accent-yellow); }
+        
+        .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; position: relative; }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+        .stat-card.green::before { background: var(--accent-green); }
+        .stat-card.blue::before { background: var(--accent-blue); }
+        .stat-card.orange::before { background: var(--accent-orange); }
+        .stat-card.purple::before { background: var(--accent-purple); }
+        .stat-card.yellow::before { background: var(--accent-yellow); }
+        .stat-value { font-size: 24px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        .stat-label { font-size: 11px; color: var(--text-muted); }
+        
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .grid-auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+        
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+        
+        .business-entry { background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; }
+        .business-entry-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .business-entry-title { font-size: 12px; font-weight: 600; color: var(--accent-blue); }
+        .business-entry-remove { background: none; border: none; color: var(--accent-red); cursor: pointer; padding: 4px; font-size: 16px; }
+        
+        .waba-card { background: var(--bg-tertiary); border: 2px solid var(--border); border-radius: var(--radius-lg); padding: 14px; cursor: pointer; transition: all 0.15s; }
+        .waba-card:hover { border-color: var(--border-hover); }
+        .waba-card.selected { border-color: var(--accent-green); background: var(--accent-green-dim); }
+        .waba-card-name { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
+        .waba-card-id { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); }
+        .waba-card-phones { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+        .phone-tag { padding: 3px 6px; background: var(--bg-card); border-radius: 100px; font-size: 10px; font-family: 'JetBrains Mono', monospace; }
+        
+        .template-card { background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+        .template-card-header { padding: 12px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .template-card-name { font-weight: 600; font-size: 12px; }
+        .template-card-body { padding: 14px; font-size: 12px; color: var(--text-secondary); max-height: 100px; overflow: hidden; }
+        .template-var { background: var(--accent-blue-dim); color: var(--accent-blue); padding: 1px 4px; border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 10px; }
+        
+        .var-field { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px; margin-bottom: 8px; }
+        .var-field-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+        .var-field-label { font-size: 11px; font-weight: 600; color: var(--accent-blue); display: flex; align-items: center; gap: 6px; }
+        .var-field-remove { background: var(--accent-red-dim); border: none; color: var(--accent-red); cursor: pointer; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .var-field-remove:hover { background: var(--accent-red); color: white; }
+        
+        .preview-panel { background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+        .preview-header { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+        .preview-body { padding: 16px; }
+        .preview-message { background: var(--accent-green-dim); border-radius: var(--radius) var(--radius) var(--radius) 0; padding: 12px; max-width: 85%; font-size: 13px; line-height: 1.5; }
+        .preview-message-header { margin-bottom: 8px; }
+        .preview-message-header img { width: 100%; border-radius: var(--radius); }
+        .preview-message-buttons { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+        .preview-button { background: rgba(255,255,255,0.1); padding: 6px; text-align: center; border-radius: var(--radius); font-size: 11px; color: var(--accent-blue); }
+        
+        .cost-display { background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-card)); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; text-align: center; }
+        .cost-value { font-size: 28px; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--accent-green); }
+        .cost-label { font-size: 11px; color: var(--text-muted); }
+        
+        .progress-bar { height: 6px; background: var(--bg-tertiary); border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent-green), #16a34a); transition: width 0.3s; }
+        
+        .log-container { background: var(--bg-tertiary); border-radius: var(--radius); padding: 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; max-height: 250px; overflow-y: auto; }
+        .log-entry { padding: 4px 0; border-bottom: 1px solid var(--border); display: flex; gap: 10px; }
+        .log-entry:last-child { border-bottom: none; }
+        .log-time { color: var(--text-muted); }
+        .log-type { font-weight: 600; width: 40px; }
+        .log-type.success { color: var(--accent-green); }
+        .log-type.error { color: var(--accent-red); }
+        .log-type.info { color: var(--accent-blue); }
+        .log-msg { color: var(--text-secondary); flex: 1; word-break: break-all; }
+        
+        .info-box { background: var(--accent-blue-dim); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 16px; font-size: 12px; }
+        .info-box-title { font-weight: 600; color: var(--accent-blue); margin-bottom: 2px; }
+        .info-box-text { color: var(--text-secondary); }
+        
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+        .toast { padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); display: flex; align-items: center; gap: 10px; min-width: 280px; animation: toastIn 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .toast.success { border-left: 3px solid var(--accent-green); }
+        .toast.error { border-left: 3px solid var(--accent-red); }
+        .toast.info { border-left: 3px solid var(--accent-blue); }
+        .toast.loading { border-left: 3px solid var(--accent-orange); }
+        .toast-spinner { width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--accent-orange); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes toastIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; background: var(--bg-tertiary); }
+        td { font-size: 12px; }
+        
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+        .empty-state h3 { color: var(--text-secondary); margin-bottom: 6px; font-size: 14px; }
+        .empty-state p { font-size: 12px; }
+        
+        .tabs { display: flex; gap: 4px; background: var(--bg-tertiary); padding: 4px; border-radius: var(--radius); margin-bottom: 16px; }
+        .tab { flex: 1; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; color: var(--text-secondary); text-align: center; }
+        .tab:hover { color: var(--text-primary); }
+        .tab.active { background: var(--bg-card); color: var(--text-primary); }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+        
+        /* Loading overlay */
+        .loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000; opacity: 0; visibility: hidden; transition: all 0.2s; }
+        .loading-overlay.active { opacity: 1; visibility: visible; }
+        .loading-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px 32px; text-align: center; }
+        .loading-spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent-green); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+        .loading-text { font-size: 14px; color: var(--text-secondary); }
+        
+        @media (max-width: 1200px) { .stats-row { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; } .grid-2 { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></div>
+                    <div class="logo-text">WA<span>Manager</span></div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Principal</div>
+                    <div class="nav-item active" data-page="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</div>
+                    <div class="nav-item" data-page="send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Enviar</div>
+                    <div class="nav-item" data-page="templates"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Templates</div>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Sistema</div>
+                    <div class="nav-item" data-page="wabas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>WABAs</div>
+                    <div class="nav-item" data-page="config"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Config</div>
+                    <div class="nav-item" data-page="logs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Logs</div>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <header class="header">
+                <h1 class="header-title" id="pageTitle">Dashboard</h1>
+                <div class="status-badge"><div class="status-dot" id="statusDot"></div><span id="statusText">Desconectado</span></div>
+            </header>
+
+            <div class="page-content">
+                <!-- DASHBOARD -->
+                <section class="page-section active" id="page-dashboard">
+                    <div class="stats-row">
+                        <div class="stat-card green"><div class="stat-value" id="statBiz">0</div><div class="stat-label">Business IDs</div></div>
+                        <div class="stat-card blue"><div class="stat-value" id="statWabas">0</div><div class="stat-label">WABAs</div></div>
+                        <div class="stat-card purple"><div class="stat-value" id="statPhones">0</div><div class="stat-label">Números</div></div>
+                        <div class="stat-card orange"><div class="stat-value" id="statTemplates">0</div><div class="stat-label">Templates</div></div>
+                        <div class="stat-card yellow"><div class="stat-value" id="statSent">0</div><div class="stat-label">Enviadas</div></div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="card"><div class="card-header"><h3 class="card-title">Business IDs</h3></div><div class="card-body" id="dashBiz"><div class="empty-state"><h3>Nenhum</h3><p>Configure em Config</p></div></div></div>
+                        <div class="card"><div class="card-header"><h3 class="card-title">Números</h3></div><div class="card-body" id="dashPhones"><div class="empty-state"><h3>Nenhum</h3></div></div></div>
+                    </div>
+                </section>
+
+                <!-- SEND -->
+                <section class="page-section" id="page-send">
+                    <div class="grid-2">
+                        <div>
+                            <div class="card"><div class="card-header"><h3 class="card-title">Número de Origem</h3></div><div class="card-body">
+                                <div class="form-group"><label class="form-label">Selecione</label><select class="form-select" id="sendPhone" onchange="onPhoneChange()"><option value="">Selecione...</option></select></div>
+                                <div id="phoneInfo" style="display:none"><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="badge badge-blue" id="pWaba"></span><span class="badge badge-green" id="pQuality"></span></div></div>
+                            </div></div>
+                            
+                            <div class="card"><div class="card-header"><h3 class="card-title">Template</h3><span class="badge badge-blue" id="tplCount">0</span></div><div class="card-body">
+                                <div class="form-group"><select class="form-select" id="sendTemplate" onchange="onTemplateChange()"><option value="">Selecione número primeiro</option></select></div>
+                                <div id="tplCategory" style="display:none;margin-bottom:12px"><span class="badge" id="tplCatBadge"></span></div>
+                                <div id="tplVars" style="display:none"><div class="form-label">Variáveis</div><div id="varFields"></div></div>
+                                <div id="headerMedia" style="display:none"><div class="form-group"><label class="form-label">URL Mídia (Header)</label><input type="text" class="form-input mono" id="mediaUrl" placeholder="https://" oninput="updatePreview()"></div></div>
+                            </div></div>
+                            
+                            <div class="card"><div class="card-header"><h3 class="card-title">Destinatários</h3><button class="btn btn-sm btn-secondary" onclick="document.getElementById('csvFile').click()">CSV/TXT</button><input type="file" id="csvFile" accept=".csv,.txt" style="display:none" onchange="importCSV(this)"></div><div class="card-body">
+                                <div class="form-group"><textarea class="form-textarea mono" id="recipients" placeholder="5511999999999, Nome, Variável2&#10;5511888888888, OutroNome, OutraVar" oninput="updateCount()"></textarea><p class="form-hint">Formato: número, var1, var2... (uma linha por destinatário)</p></div>
+                                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted)"><span><span id="recipCount">0</span> destinatários</span><button class="btn btn-sm btn-secondary" onclick="document.getElementById('recipients').value='';updateCount()">Limpar</button></div>
+                            </div></div>
+                            
+                            <div class="card"><div class="card-header"><h3 class="card-title">Intervalo (ms)</h3></div><div class="card-body">
+                                <div class="form-group"><input type="number" class="form-input" id="interval" value="1000" min="500"></div>
+                                <button class="btn btn-primary" style="width:100%" onclick="startSend()" id="btnSend"><span class="btn-text">Iniciar Envio</span></button>
+                            </div></div>
+                        </div>
+                        <div>
+                            <div class="card"><div class="card-header"><h3 class="card-title">Custo Estimado</h3></div><div class="card-body">
+                                <div class="cost-display"><div class="cost-value" id="costBRL">R$ 0,00</div><div class="cost-label">Total estimado</div></div>
+                                <div style="display:flex;justify-content:space-around;margin-top:12px;text-align:center">
+                                    <div><div style="font-size:16px;font-weight:600;font-family:'JetBrains Mono'" id="costPer">$0.0000</div><div style="font-size:10px;color:var(--text-muted)">Por msg</div></div>
+                                    <div><div style="font-size:16px;font-weight:600;font-family:'JetBrains Mono'" id="costUSD">$0.00</div><div style="font-size:10px;color:var(--text-muted)">USD</div></div>
+                                </div>
+                            </div></div>
+                            <div class="preview-panel"><div class="preview-header">Preview</div><div class="preview-body"><div class="preview-message" id="msgPreview"><span style="color:var(--text-muted)">Selecione template</span></div></div></div>
+                            <div class="card" style="margin-top:12px"><div class="card-header"><h3 class="card-title">Progresso</h3><button class="btn btn-sm btn-danger" id="btnStop" onclick="stopSend()" style="display:none">Parar</button></div><div class="card-body">
+                                <div class="progress-bar" style="margin-bottom:10px"><div class="progress-fill" id="prog" style="width:0"></div></div>
+                                <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:10px"><span>✓ <span id="sentN">0</span></span><span>✗ <span id="failN">0</span></span></div>
+                                <div class="log-container" id="sendLog" style="max-height:150px"><div style="text-align:center;color:var(--text-muted);padding:20px">Aguardando...</div></div>
+                            </div></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TEMPLATES -->
+                <section class="page-section" id="page-templates">
+                    <div class="tabs"><div class="tab active" data-tab="tplList">Por WABA</div><div class="tab" data-tab="tplCreate">Criar</div></div>
+                    <div class="tab-panel active" id="tplList"><div id="wabasTplContainer"><div class="empty-state"><h3>Carregue WABAs primeiro</h3></div></div></div>
+                    <div class="tab-panel" id="tplCreate">
+                        <div class="grid-2">
+                            <div class="card"><div class="card-header"><h3 class="card-title">Novo Template</h3></div><div class="card-body">
+                                <div class="form-group"><label class="form-label">WABA</label><select class="form-select" id="newTplWaba"><option value="">Selecione</option></select></div>
+                                <div class="form-row">
+                                    <div class="form-group"><label class="form-label">Nome</label><input type="text" class="form-input" id="newTplName" placeholder="meu_template" oninput="updateNewTplPreview()"></div>
+                                    <div class="form-group"><label class="form-label">Idioma</label><select class="form-select" id="newTplLang"><option value="pt_BR">Português</option><option value="en_US">English</option><option value="es">Español</option></select></div>
+                                </div>
+                                <div class="form-group"><label class="form-label">Categoria</label><select class="form-select" id="newTplCat"><option value="UTILITY">Utility</option><option value="MARKETING">Marketing</option><option value="AUTHENTICATION">Authentication</option></select></div>
+                                <div class="form-group"><label class="form-label">Header</label><select class="form-select" id="newTplHeader" onchange="toggleHeaderFields()"><option value="none">Sem header</option><option value="TEXT">Texto</option><option value="IMAGE">Imagem ⚠️</option><option value="VIDEO">Vídeo ⚠️</option><option value="DOCUMENT">Documento ⚠️</option></select></div>
+                                <div id="headerTxt" style="display:none"><div class="form-group"><input type="text" class="form-input" id="newTplHeaderTxt" placeholder="Título {{1}}" oninput="detectHeaderVar()"></div><div id="headerVarEx"></div></div>
+                                <div id="headerMed" style="display:none">
+                                    <div class="info-box" style="background:var(--accent-orange-dim);border-color:rgba(249,115,22,0.3)">
+                                        <div class="info-box-title" style="color:var(--accent-orange)">⚠️ Limitação da API</div>
+                                        <div class="info-box-text">Templates com mídia precisam de upload especial (Resumable Upload). Para criar templates com imagem/vídeo/documento, use o <strong>Meta Business Suite</strong> ou <strong>WhatsApp Manager</strong>.</div>
+                                    </div>
+                                    <div class="form-group"><label class="form-label">URL exemplo (preview apenas)</label><input type="text" class="form-input mono" id="newTplHeaderUrl" placeholder="https://exemplo.com/imagem.jpg" oninput="updateNewTplPreview()"></div>
+                                </div>
+                                <div class="form-group"><label class="form-label">Corpo</label><textarea class="form-textarea" id="newTplBody" placeholder="Olá {{1}}, seu pedido {{2}} foi confirmado! Obrigado por comprar conosco." oninput="detectBodyVars()"></textarea><p class="form-hint">Use {{1}}, {{2}}... Mínimo 3 palavras por variável</p></div>
+                                <div id="bodyVarEx"></div>
+                                <div class="form-group"><label class="form-label">Footer (opcional)</label><input type="text" class="form-input" id="newTplFooter" placeholder="Responda PARAR para cancelar" oninput="updateNewTplPreview()"></div>
+                                <div class="form-group"><label class="form-label">Botões (máx 3)</label><div id="newTplBtns"></div><button class="btn btn-sm btn-secondary" style="margin-top:8px" onclick="addBtn()">+ Botão</button></div>
+                                <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="createTpl()" id="btnCreateTpl"><span class="btn-text">Criar Template</span></button>
+                            </div></div>
+                            <div class="preview-panel"><div class="preview-header">Preview</div><div class="preview-body"><div class="preview-message" id="newTplPreview"><span style="color:var(--text-muted)">Preencha campos</span></div></div></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- WABAS -->
+                <section class="page-section" id="page-wabas">
+                    <div class="info-box"><div class="info-box-title">Estrutura: Business ID → WABAs → Números</div><div class="info-box-text">Cada Business ID tem seu próprio token. Templates são por WABA.</div></div>
+                    <div class="card"><div class="card-header"><h3 class="card-title">WABAs</h3><button class="btn btn-sm btn-primary" onclick="refreshAll()">Atualizar</button></div><div class="card-body"><div class="grid-auto" id="wabasGrid"><div class="empty-state"><h3>Nenhuma</h3></div></div></div></div>
+                    <div class="card"><div class="card-header"><h3 class="card-title">Números</h3></div><div class="card-body"><table><thead><tr><th>Número</th><th>Nome</th><th>WABA</th><th>Qualidade</th><th>Status</th></tr></thead><tbody id="phonesTable"><tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Nenhum</td></tr></tbody></table></div></div>
+                </section>
+
+                <!-- CONFIG -->
+                <section class="page-section" id="page-config">
+                    <div class="grid-2">
+                        <div class="card"><div class="card-header"><h3 class="card-title">Business IDs</h3><button class="btn btn-sm btn-primary" onclick="addBizEntry()">+ Adicionar</button></div><div class="card-body">
+                            <div class="info-box"><div class="info-box-title">Token por Business ID</div><div class="info-box-text">Cada Business ID precisa do seu próprio Access Token.</div></div>
+                            <div id="bizEntries"></div>
+                            <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="saveAndConnect()" id="btnConnect"><span class="btn-text">Salvar e Conectar</span></button>
+                        </div></div>
+                        <div>
+                            <div class="card"><div class="card-header"><h3 class="card-title">Ações</h3></div><div class="card-body"><div class="btn-group"><button class="btn btn-secondary" onclick="exportCfg()">Exportar</button><button class="btn btn-secondary" onclick="importCfg()">Importar</button><button class="btn btn-danger" onclick="clearAll()">Limpar</button></div></div></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- LOGS -->
+                <section class="page-section" id="page-logs">
+                    <div class="card"><div class="card-header"><h3 class="card-title">Logs</h3><button class="btn btn-sm btn-secondary" onclick="state.logs=[];renderLogs()">Limpar</button></div><div class="card-body"><div class="log-container" id="sysLogs" style="max-height:500px"><div style="text-align:center;color:var(--text-muted);padding:40px">Nenhum</div></div></div></div>
+                </section>
+            </div>
+        </main>
+    </div>
+    
+    <div class="toast-container" id="toasts"></div>
+    
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-box">
+            <div class="loading-spinner"></div>
+            <div class="loading-text" id="loadingText">Carregando...</div>
+        </div>
+    </div>
+
+    <script>
+        const _defaultBiz = [
+                {
+                    id: '784707179919795',
+                    token: 'EAAVs43iBHQEBPdH0OQl9ZByUtvRKwxe1aTDS2Wx7awTL5nUzZA442t0xspJRRfYfqWDDGkjiix8DyTZAt3rkh7GRMHabUrn33YDxzMgE7nPVffnnYLHuOdGrWKo4AZBAKHMvMURZCaR9LSRtNTSUVl72WK6RttnQkjhiWJlNtV4e5w6EdKRQE6vbcAkwsRAZDZD',
+                    name: 'Business 1'
+                },
+                {
+                    id: '120317514343989',
+                    token: 'EAAR0ysS1tOMBPF9o8AtuRFTCiyl0RZBThoUzgMPjlGNUrtHI4sCkfWAhnsOE7HNlbLSNoZBXAnvjx51ctI4P3kFPaMKFDV2uTN7IJncRKweqQHZCC5T8V0jZC3eijdBAa8LWrx4gsN7ZBwJApLXjbY8MS0RCDEfSmeApW3z1EpgpkrXAQ1u37xoQkGjZBZBtCRRgQZDZD',
+                    name: 'Business 2'
+                }
+        ];
+        const _saved = localStorage.getItem('waManagerV5');
+        const _parsed = _saved ? JSON.parse(_saved) : {};
+        const state = {
+            businesses: _parsed.businesses || _defaultBiz,
+            wabas: [],
+            phones: {},
+            allPhones: [],
+            templates: {},
+            selectedTemplate: null,
+            logs: [],
+            metrics: {sent:0, failed:0},
+            sending: {active:false, sent:0, failed:0},
+            newTplButtons: []
+        };
+
+        const PRICING = {
+            BR:{MARKETING:0.0625,UTILITY:0.035,AUTHENTICATION:0.0315,SERVICE:0},
+            US:{MARKETING:0.025,UTILITY:0.015,AUTHENTICATION:0.0135,SERVICE:0}
+        };
+        const FX = 5.0;
+
+        // NAV
+        document.querySelectorAll('.nav-item').forEach(i=>i.addEventListener('click',()=>navTo(i.dataset.page)));
+        function navTo(p){
+            document.querySelectorAll('.nav-item').forEach(i=>i.classList.toggle('active',i.dataset.page===p));
+            document.querySelectorAll('.page-section').forEach(s=>s.classList.toggle('active',s.id===`page-${p}`));
+            document.getElementById('pageTitle').textContent={dashboard:'Dashboard',send:'Enviar',templates:'Templates',wabas:'WABAs',config:'Configurações',logs:'Logs'}[p]||p;
+        }
+        document.querySelectorAll('.tabs .tab').forEach(t=>t.addEventListener('click',()=>{
+            t.parentElement.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+            t.classList.add('active');
+            document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id===t.dataset.tab));
+        }));
+
+        // LOADING
+        function showLoading(text='Carregando...'){
+            document.getElementById('loadingText').textContent=text;
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+        function hideLoading(){
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+        function setButtonLoading(btn, loading){
+            if(loading){
+                btn.disabled=true;
+                btn.classList.add('btn-loading');
+            }else{
+                btn.disabled=false;
+                btn.classList.remove('btn-loading');
+            }
+        }
+
+        // API
+        async function apiCall(token,endpoint,method='GET',body=null){
+            const r=await fetch(`https://graph.facebook.com/v21.0/${endpoint}`,{
+                method,
+                headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
+                body:body?JSON.stringify(body):null
+            });
+            const d=await r.json();
+            if(d.error)throw new Error(d.error.error_user_msg||d.error.message);
+            return d;
+        }
+
+        // CONFIG
+        function renderBizEntries(){
+            const c=document.getElementById('bizEntries');
+            if(!state.businesses.length){c.innerHTML='<p style="color:var(--text-muted);font-size:12px">Clique em "+ Adicionar"</p>';return;}
+            c.innerHTML=state.businesses.map((b,i)=>`
+                <div class="business-entry">
+                    <div class="business-entry-header"><span class="business-entry-title">Business #${i+1}</span><button class="business-entry-remove" onclick="removeBiz(${i})">✕</button></div>
+                    <div class="form-group"><label class="form-label">Business ID</label><input type="text" class="form-input mono" value="${b.id}" onchange="state.businesses[${i}].id=this.value;_persistBiz()"></div>
+                    <div class="form-group"><label class="form-label">Access Token</label><input type="password" class="form-input mono" value="${b.token}" onchange="state.businesses[${i}].token=this.value;_persistBiz()"></div>
+                    <div class="form-group"><label class="form-label">Nome (opcional)</label><input type="text" class="form-input" value="${b.name||''}" onchange="state.businesses[${i}].name=this.value;_persistBiz()"></div>
+                </div>
+            `).join('');
+        }
+        function _persistBiz(){const s=localStorage.getItem('waManagerV5');const d=s?JSON.parse(s):{};d.businesses=state.businesses;localStorage.setItem('waManagerV5',JSON.stringify(d));}
+        function addBizEntry(){state.businesses.push({id:'',token:'',name:''});renderBizEntries();_persistBiz();}
+        function removeBiz(i){state.businesses.splice(i,1);renderBizEntries();_persistBiz();}
+
+        async function saveAndConnect(){
+            // Salvar businesses + métricas no localStorage
+            localStorage.setItem('waManagerV5',JSON.stringify({businesses:state.businesses,metrics:state.metrics}));
+            const valid=state.businesses.filter(b=>b.id&&b.token);
+            if(!valid.length){toast('Nenhum Business ID configurado','error');return;}
+            
+            const btn=document.getElementById('btnConnect');
+            setButtonLoading(btn,true);
+            showLoading('Conectando às WABAs...');
+            
+            state.wabas=[];state.phones={};state.allPhones=[];
+
+            for(const biz of valid){
+                try{
+                    log('info',`Conectando Business ${biz.name||biz.id}...`);
+                    const res=await apiCall(biz.token,`${biz.id}/owned_whatsapp_business_accounts?fields=id,name`);
+                    for(const w of res.data||[]){
+                        w.businessId=biz.id;w.token=biz.token;
+                        state.wabas.push(w);
+                        try{
+                            const ph=await apiCall(biz.token,`${w.id}/phone_numbers?fields=id,display_phone_number,verified_name,quality_rating,status`);
+                            state.phones[w.id]=ph.data||[];
+                            (ph.data||[]).forEach(p=>{p.wabaId=w.id;p.wabaName=w.name;p.token=biz.token;state.allPhones.push(p);});
+                            log('success',`WABA ${w.name}: ${(ph.data||[]).length} números`);
+                        }catch(e){log('error',`Erro phones ${w.id}`);}
+                    }
+                    log('success',`Business ${biz.name||biz.id}: ${(res.data||[]).length} WABAs`);
+                }catch(e){log('error',`Erro ${biz.id}: ${e.message}`);}
+            }
+
+            hideLoading();
+            setButtonLoading(btn,false);
+            updateUI();
+            setStatus(true);
+            toast(`Conectado! ${state.wabas.length} WABAs, ${state.allPhones.length} números`,'success');
+        }
+
+        function updateUI(){
+            document.getElementById('statBiz').textContent=state.businesses.filter(b=>b.id).length;
+            document.getElementById('statWabas').textContent=state.wabas.length;
+            document.getElementById('statPhones').textContent=state.allPhones.length;
+            document.getElementById('statSent').textContent=state.metrics.sent;
+
+            const ps=document.getElementById('sendPhone');
+            ps.innerHTML='<option value="">Selecione...</option>'+state.allPhones.map(p=>`<option value="${p.id}" data-waba="${p.wabaId}" data-waba-name="${p.wabaName}" data-token="${p.token}" data-q="${p.quality_rating}">${p.display_phone_number} (${p.wabaName})</option>`).join('');
+
+            const wg=document.getElementById('wabasGrid');
+            wg.innerHTML=state.wabas.length?state.wabas.map(w=>{
+                const ph=state.phones[w.id]||[];
+                return`<div class="waba-card"><div class="waba-card-name">${w.name||'WABA'}</div><div class="waba-card-id">${w.id}</div><div class="waba-card-phones">${ph.slice(0,3).map(p=>`<span class="phone-tag">${p.display_phone_number}</span>`).join('')}${ph.length>3?`<span class="phone-tag">+${ph.length-3}</span>`:''}</div></div>`;
+            }).join(''):'<div class="empty-state"><h3>Nenhuma</h3></div>';
+
+            const pt=document.getElementById('phonesTable');
+            pt.innerHTML=state.allPhones.length?state.allPhones.map(p=>`<tr><td style="font-family:'JetBrains Mono'">${p.display_phone_number}</td><td>${p.verified_name||'-'}</td><td><span class="badge badge-blue">${p.wabaName}</span></td><td><span class="badge ${p.quality_rating==='GREEN'?'badge-green':p.quality_rating==='YELLOW'?'badge-yellow':'badge-red'}">${p.quality_rating||'N/A'}</span></td><td>${p.status||'N/A'}</td></tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Nenhum</td></tr>';
+
+            document.getElementById('dashBiz').innerHTML=state.businesses.filter(b=>b.id).length?state.businesses.filter(b=>b.id).map(b=>`<div style="padding:8px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px;font-size:12px"><strong>${b.name||'Business'}</strong><br><span style="font-family:'JetBrains Mono';font-size:10px;color:var(--text-muted)">${b.id}</span></div>`).join(''):'<div class="empty-state"><h3>Nenhum</h3></div>';
+            document.getElementById('dashPhones').innerHTML=state.allPhones.length?state.allPhones.slice(0,5).map(p=>`<div style="padding:8px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px;font-size:12px;display:flex;justify-content:space-between"><span>${p.display_phone_number}</span><span class="badge badge-blue">${p.wabaName}</span></div>`).join(''):'<div class="empty-state"><h3>Nenhum</h3></div>';
+
+            document.getElementById('newTplWaba').innerHTML='<option value="">Selecione</option>'+state.wabas.map(w=>`<option value="${w.id}" data-token="${w.token}">${w.name||w.id}</option>`).join('');
+            renderWabasTpl();
+        }
+
+        function setStatus(on){
+            document.getElementById('statusDot').classList.toggle('online',on);
+            document.getElementById('statusText').textContent=on?`${state.wabas.length} WABAs`:'Desconectado';
+        }
+
+        // SEND
+        async function onPhoneChange(){
+            const s=document.getElementById('sendPhone');
+            const o=s.options[s.selectedIndex];
+            if(!s.value){document.getElementById('phoneInfo').style.display='none';document.getElementById('sendTemplate').innerHTML='<option value="">Selecione número</option>';return;}
+            document.getElementById('phoneInfo').style.display='block';
+            document.getElementById('pWaba').textContent=o.dataset.wabaName;
+            document.getElementById('pQuality').textContent=o.dataset.q||'N/A';
+
+            const wabaId=o.dataset.waba;
+            const token=o.dataset.token;
+            const ts=document.getElementById('sendTemplate');
+            ts.innerHTML='<option value="">Carregando...</option>';
+            
+            try{
+                if(!state.templates[wabaId]){
+                    state.templates[wabaId]=(await apiCall(token,`${wabaId}/message_templates?fields=id,name,status,category,language,components&limit=100`)).data||[];
+                }
+                const tpls=state.templates[wabaId].filter(t=>t.status==='APPROVED');
+                document.getElementById('tplCount').textContent=tpls.length;
+                document.getElementById('statTemplates').textContent=Object.values(state.templates).flat().filter(t=>t.status==='APPROVED').length;
+                ts.innerHTML='<option value="">Selecione...</option>'+tpls.map(t=>`<option value="${t.name}" data-tpl='${JSON.stringify(t).replace(/'/g,"&#39;")}'>${t.name} (${t.language})</option>`).join('');
+            }catch(e){ts.innerHTML='<option value="">Erro</option>';log('error',e.message);}
+        }
+
+        function onTemplateChange(){
+            const s=document.getElementById('sendTemplate');
+            const o=s.options[s.selectedIndex];
+            if(!o?.dataset?.tpl){
+                document.getElementById('tplCategory').style.display='none';
+                document.getElementById('tplVars').style.display='none';
+                document.getElementById('headerMedia').style.display='none';
+                document.getElementById('msgPreview').innerHTML='<span style="color:var(--text-muted)">Selecione</span>';
+                state.selectedTemplate=null;
+                calcCost();return;
+            }
+            const tpl=JSON.parse(o.dataset.tpl);
+            state.selectedTemplate=tpl;
+
+            const cat=tpl.category||'UTILITY';
+            document.getElementById('tplCategory').style.display='block';
+            const cb=document.getElementById('tplCatBadge');
+            cb.textContent=cat;
+            cb.className='badge '+(cat==='MARKETING'?'badge-orange':cat==='AUTHENTICATION'?'badge-purple':'badge-blue');
+
+            renderVars(tpl);
+            updatePreview();
+            calcCost();
+        }
+
+        function renderVars(tpl){
+            const vc=document.getElementById('varFields');
+            const hm=document.getElementById('headerMedia');
+            vc.innerHTML='';hm.style.display='none';
+            let hasVars=false;
+            let varCount=0;
+
+            for(const c of tpl.components||[]){
+                if(c.type==='HEADER'&&['IMAGE','VIDEO','DOCUMENT'].includes(c.format)){hm.style.display='block';}
+                if(c.type==='HEADER'&&c.format==='TEXT'&&c.text?.includes('{{')){
+                    hasVars=true;
+                    varCount++;
+                    vc.innerHTML+=`<div class="var-field"><div class="var-field-label"><span class="template-var">{{1}}</span> Header <span style="color:var(--text-muted);font-size:10px">(ou coluna 1 do CSV)</span></div><input type="text" class="form-input" id="hVar1" placeholder="Valor padrão (opcional)" oninput="updatePreview()"></div>`;
+                }
+                if(c.type==='BODY'&&c.text){
+                    const vars=[...new Set((c.text.match(/\{\{(\d+)\}\}/g)||[]))];
+                    if(vars.length){
+                        hasVars=true;
+                        vars.forEach(v=>{
+                            const n=v.match(/\d+/)[0];
+                            varCount++;
+                            vc.innerHTML+=`<div class="var-field"><div class="var-field-label"><span class="template-var">{{${n}}}</span> Corpo <span style="color:var(--text-muted);font-size:10px">(ou coluna ${n} do CSV)</span></div><input type="text" class="form-input" id="bVar${n}" placeholder="Valor padrão (opcional)" oninput="updatePreview()"></div>`;
+                        });
+                    }
+                }
+            }
+            
+            if(hasVars){
+                vc.innerHTML=`<div class="info-box" style="margin-bottom:10px"><div class="info-box-title">💡 Variáveis Dinâmicas</div><div class="info-box-text">Use o formato: <code>número, var1, var2...</code> nos destinatários.<br>Os campos abaixo são valores padrão (usados se não houver valor na linha).</div></div>`+vc.innerHTML;
+            }
+            
+            document.getElementById('tplVars').style.display=hasVars?'block':'none';
+        }
+
+        function updatePreview(){
+            const tpl=state.selectedTemplate;if(!tpl)return;
+            let html='';
+            for(const c of tpl.components||[]){
+                if(c.type==='HEADER'){
+                    if(c.format==='TEXT'){let t=c.text||'';const v=document.getElementById('hVar1')?.value;if(v)t=t.replace('{{1}}',v);html+=`<div class="preview-message-header"><strong>${t}</strong></div>`;}
+                    else if(['IMAGE','VIDEO','DOCUMENT'].includes(c.format)){const u=document.getElementById('mediaUrl')?.value;html+=u&&c.format==='IMAGE'?`<div class="preview-message-header"><img src="${u}" onerror="this.outerHTML='📷 Imagem'"></div>`:`<div class="preview-message-header" style="background:var(--bg-tertiary);padding:12px;text-align:center;border-radius:var(--radius)">📎 ${c.format}</div>`;}
+                }
+                if(c.type==='BODY'){let t=c.text||'';(t.match(/\{\{(\d+)\}\}/g)||[]).forEach(v=>{const n=v.match(/\d+/)[0];const val=document.getElementById(`bVar${n}`)?.value||v;t=t.replace(v,`<span class="template-var">${val}</span>`);});html+=`<div>${t.replace(/\n/g,'<br>')}</div>`;}
+                if(c.type==='FOOTER')html+=`<div style="margin-top:6px;font-size:10px;color:var(--text-muted)">${c.text}</div>`;
+                if(c.type==='BUTTONS'){html+='<div class="preview-message-buttons">';(c.buttons||[]).forEach(b=>html+=`<div class="preview-button">${b.text}</div>`);html+='</div>';}
+            }
+            document.getElementById('msgPreview').innerHTML=html||'<span style="color:var(--text-muted)">Vazio</span>';
+        }
+
+        function parseRecip(t){
+            return t.split(/[\n]/).map(line=>{
+                const parts=line.split(',').map(p=>p.trim());
+                const phone=parts[0]?.replace(/\D/g,'')||'';
+                const vars=parts.slice(1); // Todas as variáveis após o número
+                return {phone, vars};
+            }).filter(r=>r.phone.length>=10);
+        }
+        function updateCount(){
+            const recips=parseRecip(document.getElementById('recipients').value);
+            document.getElementById('recipCount').textContent=recips.length;
+            
+            // Mostrar exemplo de como ficará
+            if(recips.length>0 && recips[0].vars.length>0){
+                const exemplo=recips[0];
+                document.getElementById('varFieldsHint')?.remove();
+                const hint=document.createElement('div');
+                hint.id='varFieldsHint';
+                hint.className='info-box';
+                hint.style.marginTop='10px';
+                hint.innerHTML=`<div class="info-box-title">📋 Variáveis por linha</div><div class="info-box-text">Exemplo: <strong>${exemplo.phone}</strong> receberá {{1}}=<strong>${exemplo.vars[0]||''}</strong>${exemplo.vars[1]?`, {{2}}=<strong>${exemplo.vars[1]}</strong>`:''}${exemplo.vars[2]?`, {{3}}=<strong>${exemplo.vars[2]}</strong>`:''}</div>`;
+                document.getElementById('recipients').parentElement.appendChild(hint);
+            }else{
+                document.getElementById('varFieldsHint')?.remove();
+            }
+            calcCost();
+        }
+        function importCSV(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{document.getElementById('recipients').value=parseRecip(e.target.result).join('\n');updateCount();toast('Importado','success');};r.readAsText(f);i.value='';}
+
+        function calcCost(){
+            const qty=parseRecip(document.getElementById('recipients').value).length;
+            const cat=state.selectedTemplate?.category||'UTILITY';
+            const price=PRICING.BR[cat]||0;
+            const usd=price*qty;
+            const brl=usd*FX;
+            document.getElementById('costPer').textContent=`$${price.toFixed(4)}`;
+            document.getElementById('costUSD').textContent=`$${usd.toFixed(2)}`;
+            document.getElementById('costBRL').textContent=`R$ ${brl.toFixed(2)}`;
+        }
+
+        async function startSend(){
+            const ps=document.getElementById('sendPhone');
+            const po=ps.options[ps.selectedIndex];
+            if(!ps.value)return toast('Selecione número','error');
+            if(!state.selectedTemplate)return toast('Selecione template','error');
+            const recips=parseRecip(document.getElementById('recipients').value);
+            if(!recips.length)return toast('Adicione destinatários','error');
+
+            const phoneId=ps.value;
+            const token=po.dataset.token;
+            const tpl=state.selectedTemplate;
+            const interval=parseInt(document.getElementById('interval').value)||1000;
+
+            state.sending={active:true,sent:0,failed:0};
+            document.getElementById('btnSend').disabled=true;
+            document.getElementById('btnStop').style.display='block';
+            document.getElementById('sendLog').innerHTML='';
+
+            for(const recip of recips){
+                if(!state.sending.active)break;
+                try{
+                    const msg=buildMsg(tpl, recip.vars);
+                    await apiCall(token,`${phoneId}/messages`,'POST',{messaging_product:'whatsapp',to:recip.phone,...msg});
+                    state.sending.sent++;state.metrics.sent++;
+                    const varInfo=recip.vars.length?` (${recip.vars.join(', ')})`:'';
+                    addSendLog('success',`✓ ${recip.phone}${varInfo}`);
+                }catch(e){state.sending.failed++;state.metrics.failed++;addSendLog('error',`✗ ${recip.phone}: ${e.message}`);}
+                updProg(recips.length);
+                await new Promise(r=>setTimeout(r,interval));
+            }
+            state.sending.active=false;
+            document.getElementById('btnSend').disabled=false;
+            document.getElementById('btnStop').style.display='none';
+            toast(`${state.sending.sent} enviadas, ${state.sending.failed} falhas`,'success');
+            document.getElementById('statSent').textContent=state.metrics.sent;
+        }
+        function stopSend(){state.sending.active=false;document.getElementById('btnSend').disabled=false;document.getElementById('btnStop').style.display='none';}
+
+        function buildMsg(tpl, lineVars=[]){
+            const msg={type:'template',template:{name:tpl.name,language:{code:tpl.language},components:[]}};
+            for(const c of tpl.components||[]){
+                if(c.type==='HEADER'&&['IMAGE','VIDEO','DOCUMENT'].includes(c.format)){
+                    const u=document.getElementById('mediaUrl')?.value;
+                    if(u)msg.template.components.push({type:'header',parameters:[{type:c.format.toLowerCase(),[c.format.toLowerCase()]:{link:u}}]});
+                }
+                if(c.type==='HEADER'&&c.format==='TEXT'&&c.text?.includes('{{')){
+                    // Header usa primeira variável da linha ou campo manual
+                    const v=lineVars[0]||document.getElementById('hVar1')?.value||'';
+                    msg.template.components.push({type:'header',parameters:[{type:'text',text:v}]});
+                }
+                if(c.type==='BODY'&&c.text){
+                    const vars=[...new Set((c.text.match(/\{\{(\d+)\}\}/g)||[]))];
+                    if(vars.length){
+                        const params=vars.map((v,idx)=>{
+                            const n=parseInt(v.match(/\d+/)[0]);
+                            // Usa variável da linha (index n-1) ou campo manual como fallback
+                            const value=lineVars[n-1]||document.getElementById(`bVar${n}`)?.value||'';
+                            return{type:'text',text:value};
+                        });
+                        msg.template.components.push({type:'body',parameters:params});
+                    }
+                }
+            }
+            return msg;
+        }
+
+        function updProg(t){const d=state.sending.sent+state.sending.failed;document.getElementById('prog').style.width=`${(d/t*100).toFixed(1)}%`;document.getElementById('sentN').textContent=state.sending.sent;document.getElementById('failN').textContent=state.sending.failed;}
+        function addSendLog(type,msg){const c=document.getElementById('sendLog');c.innerHTML+=`<div class="log-entry"><span class="log-time">${new Date().toLocaleTimeString()}</span><span class="log-type ${type}">${type==='success'?'OK':'ERR'}</span><span class="log-msg">${msg}</span></div>`;c.scrollTop=c.scrollHeight;}
+
+        // TEMPLATES
+        function renderWabasTpl(){
+            const c=document.getElementById('wabasTplContainer');
+            if(!state.wabas.length){c.innerHTML='<div class="empty-state"><h3>Carregue WABAs</h3></div>';return;}
+            c.innerHTML=state.wabas.map(w=>`<div class="card" style="margin-bottom:12px"><div class="card-header"><div><strong style="font-size:13px">${w.name||'WABA'}</strong><div style="font-size:10px;color:var(--text-muted)">${w.id}</div></div><button class="btn btn-sm btn-secondary" onclick="loadTpls('${w.id}','${w.token}')">Carregar</button></div><div class="card-body" id="tpls-${w.id}"><span style="color:var(--text-muted);font-size:12px">Clique Carregar</span></div></div>`).join('');
+        }
+        async function loadTpls(wid,token){
+            const c=document.getElementById(`tpls-${wid}`);c.innerHTML='<div style="display:flex;align-items:center;gap:8px"><div class="loading-spinner" style="width:20px;height:20px;border-width:2px"></div>Carregando...</div>';
+            try{
+                const tpls=(await apiCall(token,`${wid}/message_templates?fields=id,name,status,category,language,components&limit=100`)).data||[];
+                state.templates[wid]=tpls;
+                c.innerHTML=tpls.length?`<div class="grid-auto">${tpls.map(t=>`<div class="template-card"><div class="template-card-header"><span class="template-card-name">${t.name}</span><span class="badge ${t.status==='APPROVED'?'badge-green':t.status==='PENDING'?'badge-yellow':'badge-red'}">${t.status}</span></div><div class="template-card-body">${(t.components?.find(c=>c.type==='BODY')?.text||'').replace(/\{\{(\d+)\}\}/g,'<span class="template-var">{{$1}}</span>')}</div></div>`).join('')}</div>`:'<span style="color:var(--text-muted)">Nenhum</span>';
+                document.getElementById('statTemplates').textContent=Object.values(state.templates).flat().filter(t=>t.status==='APPROVED').length;
+            }catch(e){c.innerHTML=`<span style="color:var(--accent-red)">${e.message}</span>`;}
+        }
+
+        // CREATE TEMPLATE
+        function toggleHeaderFields(){
+            const t=document.getElementById('newTplHeader').value;
+            document.getElementById('headerTxt').style.display=t==='TEXT'?'block':'none';
+            document.getElementById('headerMed').style.display=['IMAGE','VIDEO','DOCUMENT'].includes(t)?'block':'none';
+            updateNewTplPreview();
+        }
+        function detectHeaderVar(){
+            const t=document.getElementById('newTplHeaderTxt').value;
+            document.getElementById('headerVarEx').innerHTML=t.includes('{{1}}')?`<div class="var-field"><div class="var-field-label"><span class="template-var">{{1}}</span> Exemplo</div><input type="text" class="form-input" id="hEx1" oninput="updateNewTplPreview()"></div>`:'';
+            updateNewTplPreview();
+        }
+        function detectBodyVars(){
+            const t=document.getElementById('newTplBody').value;
+            const vars=[...new Set((t.match(/\{\{(\d+)\}\}/g)||[]))];
+            document.getElementById('bodyVarEx').innerHTML=vars.length?vars.map(v=>{const n=v.match(/\d+/)[0];return`<div class="var-field"><div class="var-field-label"><span class="template-var">{{${n}}}</span> Exemplo</div><input type="text" class="form-input" id="bEx${n}" oninput="updateNewTplPreview()"></div>`;}).join(''):'';
+            updateNewTplPreview();
+        }
+        
+        function addBtn(){
+            if(state.newTplButtons.length>=3)return toast('Máximo 3 botões','error');
+            const id=Date.now();
+            state.newTplButtons.push({id,type:'QUICK_REPLY',text:'',url:'',phone:''});
+            renderNewTplBtns();
+        }
+        function removeBtn(id){
+            state.newTplButtons=state.newTplButtons.filter(b=>b.id!==id);
+            renderNewTplBtns();
+        }
+        function updateBtn(id,field,value){
+            const btn=state.newTplButtons.find(b=>b.id===id);
+            if(btn)btn[field]=value;
+            renderNewTplBtns();
+        }
+        function renderNewTplBtns(){
+            const c=document.getElementById('newTplBtns');
+            c.innerHTML=state.newTplButtons.map((b,i)=>`
+                <div class="var-field">
+                    <div class="var-field-header">
+                        <span class="var-field-label">Botão ${i+1}</span>
+                        <button class="var-field-remove" onclick="removeBtn(${b.id})">✕ Remover</button>
+                    </div>
+                    <div class="form-row" style="margin-bottom:8px">
+                        <select class="form-select" onchange="updateBtn(${b.id},'type',this.value)">
+                            <option value="QUICK_REPLY" ${b.type==='QUICK_REPLY'?'selected':''}>Quick Reply</option>
+                            <option value="URL" ${b.type==='URL'?'selected':''}>URL</option>
+                            <option value="PHONE_NUMBER" ${b.type==='PHONE_NUMBER'?'selected':''}>Telefone</option>
+                        </select>
+                        <input type="text" class="form-input" value="${b.text}" placeholder="Texto do botão" onchange="updateBtn(${b.id},'text',this.value);updateNewTplPreview()">
+                    </div>
+                    ${b.type==='URL'?`<input type="text" class="form-input mono" value="${b.url||''}" placeholder="https://exemplo.com" onchange="updateBtn(${b.id},'url',this.value)">`:''}
+                    ${b.type==='PHONE_NUMBER'?`<input type="text" class="form-input mono" value="${b.phone||''}" placeholder="+5511999999999" onchange="updateBtn(${b.id},'phone',this.value)">`:''}
+                </div>
+            `).join('');
+            updateNewTplPreview();
+        }
+        
+        function updateNewTplPreview(){
+            let html='';
+            const ht=document.getElementById('newTplHeader').value;
+            if(ht==='TEXT'){
+                let txt=document.getElementById('newTplHeaderTxt')?.value||'';
+                const ex=document.getElementById('hEx1')?.value;
+                if(ex)txt=txt.replace('{{1}}',`<span class="template-var">${ex}</span>`);
+                if(txt)html+=`<div class="preview-message-header"><strong>${txt}</strong></div>`;
+            }else if(['IMAGE','VIDEO','DOCUMENT'].includes(ht)){
+                const url=document.getElementById('newTplHeaderUrl')?.value;
+                if(ht==='IMAGE'&&url)html+=`<div class="preview-message-header"><img src="${url}" style="max-width:100%;border-radius:var(--radius)" onerror="this.outerHTML='📷 Imagem'"></div>`;
+                else if(ht!=='none')html+=`<div class="preview-message-header" style="background:var(--bg-tertiary);padding:12px;text-align:center;border-radius:var(--radius)">📎 ${ht}</div>`;
+            }
+            let body=document.getElementById('newTplBody')?.value||'';
+            const bvars=body.match(/\{\{(\d+)\}\}/g)||[];
+            bvars.forEach(v=>{const n=v.match(/\d+/)[0];const ex=document.getElementById(`bEx${n}`)?.value||v;body=body.replace(v,`<span class="template-var">${ex}</span>`);});
+            if(body)html+=`<div>${body.replace(/\n/g,'<br>')}</div>`;
+            const footer=document.getElementById('newTplFooter')?.value;
+            if(footer)html+=`<div style="margin-top:6px;font-size:10px;color:var(--text-muted)">${footer}</div>`;
+            if(state.newTplButtons.length){
+                html+='<div class="preview-message-buttons">';
+                state.newTplButtons.forEach(b=>{if(b.text)html+=`<div class="preview-button">${b.text}</div>`;});
+                html+='</div>';
+            }
+            document.getElementById('newTplPreview').innerHTML=html||'<span style="color:var(--text-muted)">Preencha campos</span>';
+        }
+        
+        async function createTpl(){
+            const wid=document.getElementById('newTplWaba').value;
+            const wo=document.getElementById('newTplWaba').options[document.getElementById('newTplWaba').selectedIndex];
+            if(!wid)return toast('Selecione WABA','error');
+            const token=wo.dataset.token;
+            const name=document.getElementById('newTplName').value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
+            const lang=document.getElementById('newTplLang').value;
+            const cat=document.getElementById('newTplCat').value;
+            const body=document.getElementById('newTplBody').value.trim();
+            const ht=document.getElementById('newTplHeader').value;
+            
+            if(!name)return toast('Nome obrigatório','error');
+            if(name.length<1||name.length>512)return toast('Nome deve ter 1-512 caracteres','error');
+            if(!body)return toast('Corpo obrigatório','error');
+            if(body.length>1024)return toast('Corpo máximo 1024 caracteres','error');
+            
+            // Validar mídia - não suportado via frontend
+            if(['IMAGE','VIDEO','DOCUMENT'].includes(ht)){
+                return toast('Templates com mídia devem ser criados no Meta Business Suite. Selecione "Sem header" ou "Texto".','error');
+            }
+            
+            const bodyVars=(body.match(/\{\{(\d+)\}\}/g)||[]).length;
+            const bodyWords=body.replace(/\{\{\d+\}\}/g,'').trim().split(/\s+/).filter(w=>w).length;
+            if(bodyVars>0&&bodyWords<bodyVars*3){
+                return toast(`Corpo muito curto! Mínimo ~${bodyVars*3} palavras para ${bodyVars} variável(is)`,'error');
+            }
+
+            const components=[];
+            
+            // Header TEXT
+            if(ht==='TEXT'){
+                const txt=document.getElementById('newTplHeaderTxt').value.trim();
+                if(txt){
+                    if(txt.length>60)return toast('Header máximo 60 caracteres','error');
+                    const h={type:'HEADER',format:'TEXT',text:txt};
+                    if(txt.includes('{{1}}')){
+                        const ex=document.getElementById('hEx1')?.value?.trim()||'exemplo';
+                        h.example={header_text:[ex]};
+                    }
+                    components.push(h);
+                }
+            }
+
+            // Body
+            const bc={type:'BODY',text:body};
+            const bvars=[...new Set((body.match(/\{\{(\d+)\}\}/g)||[]))];
+            if(bvars.length){
+                bc.example={body_text:[bvars.map(v=>{
+                    const n=v.match(/\d+/)[0];
+                    return document.getElementById(`bEx${n}`)?.value?.trim()||'exemplo';
+                })]};
+            }
+            components.push(bc);
+
+            // Footer
+            const footer=document.getElementById('newTplFooter').value.trim();
+            if(footer){
+                if(footer.length>60)return toast('Footer máximo 60 caracteres','error');
+                components.push({type:'FOOTER',text:footer});
+            }
+
+            // Buttons
+            const btns=state.newTplButtons.filter(b=>b.text?.trim()).map(b=>{
+                const btn={type:b.type,text:b.text.trim()};
+                if(b.type==='URL'){
+                    if(!b.url?.trim())return null;
+                    btn.url=b.url.trim();
+                }
+                if(b.type==='PHONE_NUMBER'){
+                    if(!b.phone?.trim())return null;
+                    btn.phone_number=b.phone.trim();
+                }
+                return btn;
+            }).filter(Boolean);
+            
+            if(btns.length){
+                // Validar botões
+                const qrCount=btns.filter(b=>b.type==='QUICK_REPLY').length;
+                const ctaCount=btns.filter(b=>b.type!=='QUICK_REPLY').length;
+                if(qrCount>3)return toast('Máximo 3 botões Quick Reply','error');
+                if(ctaCount>2)return toast('Máximo 2 botões Call to Action','error');
+                if(qrCount>0&&ctaCount>0)return toast('Não pode misturar Quick Reply com outros tipos','error');
+                components.push({type:'BUTTONS',buttons:btns});
+            }
+
+            const payload={name,language:lang,category:cat,components};
+            console.log('Creating template:',JSON.stringify(payload,null,2));
+
+            const btn=document.getElementById('btnCreateTpl');
+            setButtonLoading(btn,true);
+            showLoading('Criando template...');
+
+            try{
+                const result=await apiCall(token,`${wid}/message_templates`,'POST',payload);
+                hideLoading();
+                setButtonLoading(btn,false);
+                toast('Template enviado para aprovação!','success');
+                log('success',`Template "${name}" criado (ID: ${result.id})`);
+                
+                // Limpar form
+                document.getElementById('newTplName').value='';
+                document.getElementById('newTplBody').value='';
+                document.getElementById('newTplFooter').value='';
+                document.getElementById('newTplHeader').value='none';
+                document.getElementById('newTplHeaderTxt').value='';
+                document.getElementById('newTplHeaderUrl').value='';
+                document.getElementById('bodyVarEx').innerHTML='';
+                document.getElementById('headerVarEx').innerHTML='';
+                state.newTplButtons=[];
+                renderNewTplBtns();
+                toggleHeaderFields();
+                updateNewTplPreview();
+            }catch(e){
+                hideLoading();
+                setButtonLoading(btn,false);
+                toast(e.message,'error');
+                log('error',`Erro ao criar template: ${e.message}`);
+            }
+        }
+
+        // LOGS
+        function log(type,msg){state.logs.unshift({time:new Date(),type,msg});renderLogs();}
+        function renderLogs(){const c=document.getElementById('sysLogs');c.innerHTML=state.logs.length?state.logs.slice(0,100).map(l=>`<div class="log-entry"><span class="log-time">${l.time.toLocaleTimeString()}</span><span class="log-type ${l.type}">${l.type.toUpperCase()}</span><span class="log-msg">${l.msg}</span></div>`).join(''):'<div style="text-align:center;color:var(--text-muted);padding:40px">Nenhum</div>';}
+
+        // UTILS
+        function toast(msg,type='info'){
+            const c=document.getElementById('toasts');
+            const t=document.createElement('div');
+            t.className=`toast ${type}`;
+            t.innerHTML=type==='loading'?`<div class="toast-spinner"></div><span style="font-size:12px">${msg}</span>`:`<span style="font-size:12px">${msg}</span>`;
+            c.appendChild(t);
+            if(type!=='loading')setTimeout(()=>t.remove(),4000);
+            return t;
+        }
+        function exportCfg(){const d=JSON.stringify({businesses:state.businesses},null,2);const b=new Blob([d],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='wa-config.json';a.click();}
+        function importCfg(){const i=document.createElement('input');i.type='file';i.accept='.json';i.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);state.businesses=d.businesses||[];renderBizEntries();toast('Importado','success');}catch(e){toast('Erro','error');}};r.readAsText(f);};i.click();}
+        function clearAll(){if(confirm('Limpar tudo?')){localStorage.clear();location.reload();}}
+        async function refreshAll(){await saveAndConnect();}
+
+        // INIT
+        document.addEventListener('DOMContentLoaded',()=>{
+            // Carregar métricas salvas (se houver)
+            const saved=localStorage.getItem('waManagerV5');
+            if(saved){
+                try{
+                    const d=JSON.parse(saved);
+                    if(d.metrics)state.metrics=d.metrics;
+                }catch(e){}
+            }
+            renderBizEntries();
+            log('info','WA Manager v5 iniciado');
+            // Auto-conectar com config pré-definida
+            saveAndConnect();
+        });
+    </script>
+</body>
+</html>
